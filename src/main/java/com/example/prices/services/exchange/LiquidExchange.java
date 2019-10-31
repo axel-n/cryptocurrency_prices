@@ -2,16 +2,17 @@ package com.example.prices.services.exchange;
 
 import com.example.prices.models.Pair;
 import com.example.prices.models.dict.Symbol;
+import com.example.prices.websocket.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
+import org.springframework.web.reactive.socket.client.WebSocketClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,32 +26,27 @@ public class LiquidExchange implements ExchangeService {
     }
 
     @Override
-    public Mono<BigDecimal> getPriceByPair(Pair pair) {
+    public void getPriceByPair(Pair pair) {
 
         Integer pairId = pairsById.get(pair);
 
         if (pairId != null) {
 
-            String pairExchangeUrl = "/products/";
-            String url = pairExchangeUrl + pairId;
+            try {
+                Client client = new Client(new URI("wss://www.bitmex.com/realtime?subscribe=instrument,orderBook:XBTUSD"));
+                client.connect();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
 
-            return webClient.get()
-                    .uri(apiRoot + url)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .filter(response -> !response.statusCode().isError())
-                    .flatMap(body -> body.bodyToMono(new ParameterizedTypeReference<Map<String, String>>() {
-                    }))
-                    .map(map -> {
-                        BigDecimal marketAsk = new BigDecimal(map.get("market_ask"));
-                        BigDecimal marketBid = new BigDecimal(map.get("market_bid"));
 
-                        return getAvgPrice(marketAsk, marketBid);
-                    });
+
+//            System.out.println(String.format("Exchange: %s. pair: %s-%s - price: %s",
+//                    exchange, pair.getLeft(), pair.getRight(), stock.getPrice()));
+
 
         } else {
             log.error("unknown pair!");
-            return Mono.just(new BigDecimal("0"));
         }
     }
 
@@ -62,11 +58,10 @@ public class LiquidExchange implements ExchangeService {
     private String apiRoot;
 
 
-    private final WebClient webClient = WebClient.create();
+    private final WebSocketClient client = new ReactorNettyWebSocketClient();
 
     // у биржи нельзя искать по паре, только по id
     private final Map<Pair, Integer> pairsById = new HashMap<>();
-
 
 
 }
