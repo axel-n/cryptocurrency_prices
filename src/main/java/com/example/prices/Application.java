@@ -1,6 +1,7 @@
 package com.example.prices;
 
 import com.example.prices.models.Pair;
+import com.example.prices.models.Stock;
 import com.example.prices.models.dict.Exchange;
 import com.example.prices.models.dict.Symbol;
 import com.example.prices.services.stock.StockService;
@@ -28,12 +29,9 @@ public class Application implements CommandLineRunner {
         Pair pair = new Pair(Symbol.BTC, Symbol.JPY);
         Exchange exchange = Exchange.Liquid;
 
-         stockService.getStock(new Pair(Symbol.BTC, Symbol.JPY), Exchange.Liquid)
-                .doOnNext(stock -> {
+        Stock stock = stockService.getStock(new Pair(Symbol.BTC, Symbol.JPY), Exchange.Liquid);
 
-                    System.out.println(String.format("Exchange: %s. pair: %s %s - price: %s",
-                            exchange, pair.getLeft(), pair.getRight(), stock.getPrice()));
-                });
-
+        System.out.println(String.format("Exchange: %s. pair: %s-%s - price: %s",
+                exchange, pair.getLeft(), pair.getRight(), stock.getPrice()));
     }
 }
