@@ -1,4 +1,4 @@
-package com.example.prices.services.internal;
+package com.example.prices.services.stock;
 
 import com.example.prices.models.Stock;
 import com.example.prices.models.Symbol;
