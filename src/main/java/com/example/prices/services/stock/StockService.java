@@ -4,5 +4,5 @@ import com.example.prices.models.Pair;
 import com.example.prices.models.dict.Exchange;
 
 public interface StockService {
-    void getStock(Pair pair, Exchange exchange);
+    void subscribe(Pair pair, Exchange exchange);
 }

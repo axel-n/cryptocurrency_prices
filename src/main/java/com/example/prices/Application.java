@@ -12,22 +12,23 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Slf4j
 @SpringBootApplication
 public class Application implements CommandLineRunner {
-    public Application(StockService stockService) {
-        this.stockService = stockService;
+
+    @Override
+    public void run(String... args) {
+
+        Pair XBT_USD = new Pair(Symbol.XBT, Symbol.USD);
+        Exchange exchange = Exchange.BitMEX;
+
+        stockService.subscribe(XBT_USD, exchange);
     }
+
+    private final StockService stockService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
-    private final StockService stockService;
-
-    @Override
-    public void run(String... args) {
-
-        Pair pair = new Pair(Symbol.BTC, Symbol.JPY);
-        Exchange exchange = Exchange.Liquid;
-
-        stockService.getStock(pair, exchange);
+    public Application(StockService stockService) {
+        this.stockService = stockService;
     }
 }
