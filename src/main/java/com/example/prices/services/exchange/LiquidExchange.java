@@ -1,50 +1,37 @@
 package com.example.prices.services.exchange;
 
 import com.example.prices.models.Pair;
-import com.example.prices.models.dict.Symbol;
+import com.example.prices.websocket.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Slf4j
 @Service
 public class LiquidExchange implements ExchangeService {
 
-    public LiquidExchange() {
-        pairsById.put(new Pair(Symbol.BTC, Symbol.JPY), 5);
-        pairsById.put(new Pair(Symbol.BTC, Symbol.USD), 1);
-    }
-
     @Override
     public void subscribe(Pair pair) {
 
-        Integer pairId = pairsById.get(pair);
+        String pairToSend = (pair.getLeft().toString() + pair.getRight().toString()).toLowerCase();
 
-        if (pairId != null) {
+            String url = wsRoot;
+            try {
+                Client client = new Client(new URI(url));
+                client.connectBlocking();
+                client.send( String.format(channelTemplate, pairToSend) );
 
-            // TODO this
-            log.warn("not implemented");
-
-        } else {
-            log.error("unknown pair!");
-        }
-    }
-
-    private BigDecimal getAvgPrice(BigDecimal marketAsk, BigDecimal marketBid) {
-        return marketAsk.add(marketBid).divide(new BigDecimal("2"), RoundingMode.HALF_UP);
+            } catch (URISyntaxException | InterruptedException e) {
+                log.error("{}", e.getMessage());
+                e.printStackTrace();
+            }
     }
 
     @Value("${liquid.ws.root}")
-    private String apiRoot;
+    private String wsRoot;
 
-
-
-    // у биржи нельзя искать по паре, только по id
-    private final Map<Pair, Integer> pairsById = new HashMap<>();
-
+    private final String channelTemplate = "{\"event\":\"pusher:subscribe\",\"data\":{\"channel\":\"product_cash_%s_5\"}}";
 }

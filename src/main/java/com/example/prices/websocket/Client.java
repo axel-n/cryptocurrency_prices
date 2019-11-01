@@ -39,7 +39,7 @@ public class Client extends WebSocketClient {
             Map<String, Object> map = OM.readValue(message, new TypeReference<>() {
             });
 
-            log.info("map {}", map);
+            log.info("receive message {}", map);
 
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());

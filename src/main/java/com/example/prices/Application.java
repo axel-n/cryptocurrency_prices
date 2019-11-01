@@ -16,10 +16,11 @@ public class Application implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        Pair XBT_USD = new Pair(Symbol.XBT, Symbol.USD);
-        Exchange exchange = Exchange.BitMEX;
+        stockService.subscribe(BTC_JPY, Exchange.Liquid);
+        stockService.subscribe(BTC_USD, Exchange.Liquid);
 
-        stockService.subscribe(XBT_USD, exchange);
+        stockService.subscribe(XBT_USD, Exchange.BitMEX);
+        stockService.subscribe(BTC_USD, Exchange.BitMEX);
     }
 
     private final StockService stockService;
@@ -31,4 +32,9 @@ public class Application implements CommandLineRunner {
     public Application(StockService stockService) {
         this.stockService = stockService;
     }
+
+    private final Pair XBT_USD = new Pair(Symbol.XBT, Symbol.USD);
+    private final Pair BTC_JPY = new Pair(Symbol.BTC, Symbol.JPY);
+    private final Pair BTC_USD = new Pair(Symbol.BTC, Symbol.USD);
+
 }
