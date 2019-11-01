@@ -1,6 +1,7 @@
 package com.example.prices.services.exchange;
 
 import com.example.prices.models.Pair;
+import com.example.prices.models.dict.Exchange;
 import com.example.prices.websocket.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,7 @@ public class LiquidExchange implements ExchangeService {
 
             String url = wsRoot;
             try {
-                Client client = new Client(new URI(url));
+                Client client = new Client(new URI(url), Exchange.Liquid);
                 client.connectBlocking();
                 client.send( String.format(channelTemplate, pairToSend) );
 

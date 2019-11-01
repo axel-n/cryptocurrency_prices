@@ -1,6 +1,7 @@
 package com.example.prices.services.exchange;
 
 import com.example.prices.models.Pair;
+import com.example.prices.models.dict.Exchange;
 import com.example.prices.websocket.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,7 @@ public class BitMexExchange implements ExchangeService {
 
         String url = wsRoot + wsPrefix + pair.getLeft() + pair.getRight();
         try {
-            Client client = new Client(new URI(url));
+            Client client = new Client(new URI(url), Exchange.BitMEX);
             client.connect();
         } catch (URISyntaxException e) {
             log.error("{}", e.getMessage());
